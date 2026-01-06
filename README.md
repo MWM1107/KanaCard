@@ -2,9 +2,11 @@
 
 **KanaCard** is a high-fidelity Japanese learning application built with Swift and SwiftUI, designed to help users master Hiragana and Katakana through active recall and fluid, tactile interactions.
 
+https://github.com/user-attachments/assets/70454827-4627-4c4c-9d27-27a8dbd84a69
+
 ---
 
-## 🚀 The Vibe (Key Features)
+## 🚀 The Vibe & Key Features
 
 * **Active Recall UI**: A seamless 3D card-flip interaction that simulates physical flashcards for maximum retention.
 * **"Tinder-Style" Flick UX**: Fluid navigation using gesture-driven physics—swipe to move through the deck with interactive spring animations.

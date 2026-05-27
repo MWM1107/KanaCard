@@ -14,14 +14,20 @@ https://github.com/user-attachments/assets/70454827-4627-4c4c-9d27-27a8dbd84a69
     * **Specular Shine**: A `RadialGradient` overlay that follows your finger to simulate light reflecting off a glossy card.
     * **Responsive Shadows**: Shadows that shift dynamically based on card position to create a sense of depth.
 * **Adaptive Design**: Fully responsive layout using `GeometryReader` that scales perfectly across the entire Apple ecosystem, from iPhone SE to iPad Pro.
-* **Deck Customization**: Filter between Hiragana, Katakana, or the full set, with a randomized shuffle feature for a fresh study session every time.
+* **Granular Deck Customization**: A bottom settings sheet lets you precisely tune your study session:
+    * **Script Picker**: Segment between All, Hiragana (あ), and Katakana (ア).
+    * **Kana Set Filters**: Toggle individual variant sets via filter chips—Basic (あ seion), Voiced (が dakuon), Semi-Voiced (ぱ handakuon), and Contracted (きゃ yoon). At least one set always stays active to prevent an empty deck.
+    * **Quick Options**: Reset or shuffle the deck without leaving the card view.
+* **Complete Kana Coverage**: The deck spans the full Japanese kana system—over 200 characters including all seion, dakuon, handakuon, and yoon combinations for both scripts.
 
 ## 🛠 Tech Stack & Modern Patterns
 
 * **Swift 6 / SwiftUI**: Utilizing the latest in Apple's declarative UI framework.
 * **Observation Framework**: Managed application state using the modern `@Observable` macro for high-performance view updates.
 * **GeometryProxy**: Advanced container-relative sizing for font and frame scaling.
-* **MVVM Architecture**: Clean separation of concerns between the data model and the presentation layer.
+* **MVVM Architecture**: Clean separation of concerns with dedicated `Models/`, `ViewModels/`, and `Views/Components/` folders.
+* **Presentation Detents**: Settings exposed in a native bottom sheet using `.presentationDetents([.medium, .large])` for a seamless, in-context experience.
+* **Reusable Components**: `FilterChipsView` is a self-contained toggle chip built with a `@Binding`, keeping filter state cleanly owned by the ViewModel.
 
 ## 📈 Roadmap & Future Slay
 

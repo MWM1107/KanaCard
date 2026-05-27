@@ -1,5 +1,5 @@
 //
-//  KanaView.swift
+//  CardView.swift
 //  KanaCard
 //
 //  Created by Kevin Struna on 12/31/25.
@@ -7,70 +7,9 @@
 
 import SwiftUI
 
-struct KanaView: View {
-    @State private var kanaViewModel = KanaViewModel()
-
-    var body: some View {
-        GeometryReader { mainProxy in
-            NavigationStack {
-                VStack {
-                    Card(kanaViewModel: kanaViewModel)
-                    
-                    HStack {
-                        Button(action: kanaViewModel.previousCard) {
-                            Label("Back", systemImage: "arrow.left")
-                        }
-                        
-                        Text(kanaViewModel.currentIndex.description + " / " + kanaViewModel.filteredKana.count.description)
-                            .font(.system(size: mainProxy.size.height * 0.05, weight: .semibold, design: .rounded))
-                            .padding()
-                        
-                        Button(action: kanaViewModel.nextCard) {
-                            Label("Next", systemImage: "arrow.right")
-                        }
-                    }
-                    .padding(.bottom)
-                    .font(.system(size: mainProxy.size.height * 0.025, weight: .semibold, design: .rounded))
-                    .lineLimit(1)
-                    .labelStyle(.iconOnly)
-                    .buttonStyle(.glassProminent)
-                }
-                .toolbar {
-                    ToolbarItemGroup(placement: .primaryAction) {
-                        Menu {
-                            Text("KanaCard")
-                            Text("App Version 1.0")
-                            Text("Designed By Kevin Struna in Colorado")
-
-                        } label: {
-                            Label("Information", systemImage: "info.circle")
-                        }
-                        
-                        Menu {
-                            Button("All", systemImage: "a.circle", action: {kanaViewModel.filter = .all})
-                            Button("Hiragana", systemImage: "h.circle", action: {kanaViewModel.filter = .hiragana})
-                            Button("Katakana", systemImage: "k.circle", action: {kanaViewModel.filter = .katakana})
-                        } label: {
-                            Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
-                        }
-                        
-                        Menu {
-                            Button("Reset Deck", systemImage: "restart.circle", action: {kanaViewModel.currentIndex = 0})
-                            Button("Shuffle Deck", systemImage:  "shuffle.circle", action: kanaViewModel.shuffleKanaCards)
-                            
-                        } label: {
-                            Label("Options", systemImage: "ellipsis.circle")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct Card: View {
+struct CardView: View {
     @Bindable var kanaViewModel: KanaViewModel
-    @State var dragDisplacement : CGSize = .zero
+    @State private var dragDisplacement : CGSize = .zero
 
     var body: some View {
         
@@ -83,7 +22,7 @@ struct Card: View {
             ZStack {
                 if proxy.size.width < proxy.size.height {
                     // Sqaure card look
-                    RoundedRectangle(cornerRadius: 22.0, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [Color.cyan, Color.accentColor],
@@ -105,7 +44,7 @@ struct Card: View {
                             .frame(maxWidth: proxy.size.width * 0.9, maxHeight: proxy.size.height * 0.6)
                 } else {
                     // 3x5 card look
-                    RoundedRectangle(cornerRadius: 22.0, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [Color.cyan, Color.accentColor],
@@ -191,5 +130,6 @@ struct Card: View {
 }
 
 #Preview {
-    KanaView()
+    @Previewable @State var kanaViewModel = KanaViewModel()
+    CardView(kanaViewModel: kanaViewModel)
 }

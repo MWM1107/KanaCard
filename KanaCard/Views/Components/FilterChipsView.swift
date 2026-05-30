@@ -11,6 +11,7 @@ struct FilterChipsView: View {
     let title: String
     @Binding var isOn: Bool
     @State private var isJiggling: Bool = false
+    @AppStorage("appTheme") var appTheme: String = "Ocean"
     
     var body: some View {
         Button(action: {
@@ -25,12 +26,12 @@ struct FilterChipsView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(isOn ? Color.accentColor : Color(.systemGray6))
+            .background(isOn ? Color(appTheme) : Color(.systemGray6))
             .foregroundColor(isOn ? .white : .primary)
             .cornerRadius(16)
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .stroke(isOn ? Color.blue : Color.clear, lineWidth: 1)
+                    .stroke(isOn ? Color(appTheme) : Color.clear, lineWidth: 1)
             )
 
         }

@@ -10,9 +10,12 @@ import SwiftData
 
 @main
 struct KanaCardApp: App {
+    @AppStorage("appTheme") var appTheme: String = "Ocean"
+    
     var body: some Scene {
         WindowGroup {
             KanaView()
+                .tint(Color(appTheme))
         }
     }
 }

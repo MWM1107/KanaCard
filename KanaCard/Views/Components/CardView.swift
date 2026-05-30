@@ -10,6 +10,7 @@ import SwiftUI
 struct CardView: View {
     @Bindable var kanaViewModel: KanaViewModel
     @State private var dragDisplacement : CGSize = .zero
+    @AppStorage("appTheme") var appTheme: String = "Ocean"
 
     var body: some View {
         
@@ -25,7 +26,7 @@ struct CardView: View {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [Color.cyan, Color.accentColor],
+                                colors: [Color(appTheme).mix(with: .white, by: 0.4), Color(appTheme)],
                                 startPoint: angle > 90 ? .topTrailing : .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -47,7 +48,7 @@ struct CardView: View {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [Color.cyan, Color.accentColor],
+                                colors: [Color(appTheme).mix(with: .white, by: 0.4), Color(appTheme)],
                                 startPoint: angle > 90 ? .topTrailing : .topLeading,
                                 endPoint: .bottomTrailing
                             )

@@ -16,6 +16,7 @@ enum KanaFilter {
 @Observable
 class KanaViewModel {
     
+    // MARK: - Properties
     var isSeion: Bool = true {
         didSet {
             if !isSeion && !isDakuon && !isHandakuon && !isYoon {
@@ -24,6 +25,7 @@ class KanaViewModel {
             resetCurrentIndex()
         }
     }
+    
     var isDakuon: Bool = true {
         didSet {
             if !isSeion && !isDakuon && !isHandakuon && !isYoon {
@@ -32,6 +34,7 @@ class KanaViewModel {
             resetCurrentIndex()
         }
     }
+    
     var isHandakuon: Bool = false {
         didSet {
             if !isSeion && !isDakuon && !isHandakuon && !isYoon {
@@ -40,6 +43,7 @@ class KanaViewModel {
             resetCurrentIndex()
         }
     }
+    
     var isYoon: Bool = false {
         didSet {
             if !isSeion && !isDakuon && !isHandakuon && !isYoon {
@@ -59,50 +63,56 @@ class KanaViewModel {
             isFront = true
         }
     }
-
+    
+    // MARK: - Initialization
+    
     init(allKana: [Kana] = Kana.allExamples) {
         self.allKana = allKana
     }
     
+    // MARK: - Computed Properties
+    
     var filteredKana: [Kana] {
-    var allowed: [KanaVariant] = []
+        var allowed: [KanaVariant] = []
         
-    if isSeion {
-        allowed.append(.seion)
-    }
-            
-    if isDakuon {
-        allowed.append(.dakuon)
-    }
-            
-    if isHandakuon {
-        allowed.append(.handakuon)
-    }
-        
-    if isYoon {
-        allowed.append(.yoon)
-    }
-            
-    switch filter {
-        case .hiragana:
-            return allKana.filter { kana in
-                kana.type == .hiragana && allowed.contains(kana.variant)
-            }
-                
-        case .katakana:
-            return allKana.filter { kana in
-                kana.type == .katakana && allowed.contains(kana.variant)
-            }
-                
-        case .all:
-            return allKana
+        if isSeion {
+            allowed.append(.seion)
         }
-    }
+                
+        if isDakuon {
+            allowed.append(.dakuon)
+        }
+                
+        if isHandakuon {
+            allowed.append(.handakuon)
+        }
+            
+        if isYoon {
+            allowed.append(.yoon)
+        }
+                
+        switch filter {
+            case .hiragana:
+                return allKana.filter { kana in
+                    kana.type == .hiragana && allowed.contains(kana.variant)
+                }
+                    
+            case .katakana:
+                return allKana.filter { kana in
+                    kana.type == .katakana && allowed.contains(kana.variant)
+                }
+                    
+            case .all:
+                return allKana
+            }
+        }
     
     var currentCard: Kana {
-            filteredKana[currentIndex]
+        filteredKana[currentIndex]
     }
-        
+    
+    // MARK: - Methods / Intents
+    
     func shuffleKanaCards() {
         allKana.shuffle()
     }
@@ -130,5 +140,4 @@ class KanaViewModel {
     func resetCurrentIndex() {
         currentIndex = 0
     }
-    
 }

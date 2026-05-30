@@ -10,6 +10,7 @@ import SwiftUI
 struct KanaView: View {
     @State private var kanaViewModel = KanaViewModel()
     @State private var showSheet: Bool = false
+    // @State private var backgroundColor: Color = .white
 
     var body: some View {
         GeometryReader { mainProxy in

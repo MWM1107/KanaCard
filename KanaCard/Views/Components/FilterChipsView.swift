@@ -10,11 +10,14 @@ import SwiftUI
 struct FilterChipsView: View {
     let title: String
     @Binding var isOn: Bool
+    @State private var isJiggling: Bool = false
     
     var body: some View {
         Button(action: {
-            withAnimation {
-                isOn.toggle()
+            isOn.toggle()
+            isJiggling = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.32) {
+                isJiggling = false
             }
         }){
             HStack {
@@ -32,6 +35,11 @@ struct FilterChipsView: View {
 
         }
         .buttonStyle(.plain)
+        .rotationEffect(.degrees(isJiggling ? 5 : 0))
+        .scaleEffect(isJiggling ? 1.1 : 1)
+        .animation(
+            .easeInOut(duration: 0.10).repeatCount(3, autoreverses: true), value: isJiggling,
+        )
     }
 }
 

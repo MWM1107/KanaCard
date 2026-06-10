@@ -6,13 +6,33 @@
 //
 
 import Foundation
+import SwiftData
 
-struct Kana: Identifiable, Codable {
+@Model
+class Kana: Identifiable {
     var id = UUID()
-    let character: String // "あ"
-    let romaji: String    // "a"
-    let type: KanaType    // enum: .hiragana or .katakana
-    let variant: KanaVariant // enum: .seion, .dakuon, .handakuon, .yoon
+    var character: String // "あ"
+    var romaji: String    // "a"
+    var type: KanaType    // enum: .hiragana or .katakana
+    var variant: KanaVariant // enum: .seion, .dakuon, .handakuon, .yoon
+    
+    // SRS Properties
+    var dueDate: Date // The exact date this card should appear in the active deck again.
+    var interval: Int // The number of days to wait before the next review.
+    var easeFactor: Double // The multiplier that dictates how fast the interval grows (usually starts at 2.5).
+    var repetitions: Int // The number of consecutive times the user has answered this card correctly.
+    
+    init(id: UUID = UUID(), character: String, romaji: String, type: KanaType, variant: KanaVariant, dueDate: Date = Date(), interval: Int = 0, easeFactor: Double = 2.5, repetitions: Int = 0) {
+        self.id = id
+        self.character = character
+        self.romaji = romaji
+        self.type = type
+        self.variant = variant
+        self.dueDate = dueDate
+        self.interval = interval
+        self.easeFactor = easeFactor
+        self.repetitions = repetitions
+    }
 }
 
 enum KanaType: String, Codable {
@@ -25,6 +45,13 @@ enum KanaVariant: String, Codable, CaseIterable, Hashable {
     case dakuon     // Dakuten (Voiced)
     case handakuon  // Handakuten (Semi-voiced)
     case yoon       // Contracted (kya, sha, etc.)
+}
+
+enum RatingType: String {
+    case fail
+    case hard
+    case good
+    case easy
 }
 
 extension Kana {

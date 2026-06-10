@@ -23,66 +23,36 @@ struct CardView: View {
             ZStack {
                 if proxy.size.width < proxy.size.height {
                     // Sqaure card look
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(appTheme).mix(with: .white, by: 0.4), Color(appTheme)],
-                                startPoint: angle > 90 ? .topTrailing : .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .overlay(
-                                RadialGradient(
-                                    colors: [.white.opacity(0.3), .clear],
-                                    center: UnitPoint(
-                                        x: 0.5 + (dragDisplacement.width / proxy.size.width),
-                                        y: 0.5 + (dragDisplacement.height / proxy.size.height)
-                                    ),
-                                    startRadius: 0,
-                                    endRadius: 200
-                                )
-                            )
-                            .frame(maxWidth: proxy.size.width * 0.9, maxHeight: proxy.size.height * 0.6)
+                    GlassCardBackground(kanaViewModel: kanaViewModel)
+                            .aspectRatio(1/1, contentMode: .fit)
+                            .padding()
                 } else {
                     // 3x5 card look
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(appTheme).mix(with: .white, by: 0.4), Color(appTheme)],
-                                startPoint: angle > 90 ? .topTrailing : .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .overlay(
-                                RadialGradient(
-                                    colors: [.white.opacity(0.3), .clear],
-                                    center: UnitPoint(
-                                        x: 0.5 + (dragDisplacement.width / proxy.size.width),
-                                        y: 0.5 + (dragDisplacement.height / proxy.size.height)
-                                    ),
-                                    startRadius: 0,
-                                    endRadius: 200
-                                )
-                            )
-                            .frame(maxWidth: proxy.size.width * 0.6, maxHeight: proxy.size.height * 0.9)
+                    GlassCardBackground(kanaViewModel: kanaViewModel)
+                            .aspectRatio(5/3, contentMode: .fit)
+                            .padding()
                 }
                 
                 if angle < 90 {
-                    Text(kanaViewModel.currentCard.character)
-                        .foregroundStyle(Color.white)
-                        .font(.system(size: proxy.size.width * 0.5, weight: .semibold, design: .rounded))
-                        .rotation3DEffect(
-                            .degrees(angle),
-                            axis: (x: 0, y: 1, z: 0)
-                        )
+                    if let currentFacingCard = kanaViewModel.currentCard {
+                        Text(currentFacingCard.character)
+                            .foregroundStyle(Color.white)
+                            .font(.system(size: min(proxy.size.width * 0.4, proxy.size.height * 0.4), weight: .semibold, design: .rounded))
+                            .rotation3DEffect(
+                                .degrees(angle),
+                                axis: (x: 0, y: 1, z: 0)
+                            )
+                    }
                 } else {
-                    Text(kanaViewModel.currentCard.romaji)
-                        .foregroundStyle(Color.white)
-                        .font(.system(size: proxy.size.width * 0.5, weight: .semibold, design: .rounded))
-                        .rotation3DEffect(
-                            .degrees(angle),
-                            axis: (x: 0, y: 1, z: 0)
-                        )
+                    if let currentFacingCard = kanaViewModel.currentCard {
+                        Text(currentFacingCard.romaji)
+                            .foregroundStyle(Color.white)
+                            .font(.system(size: min(proxy.size.width * 0.4, proxy.size.height * 0.4), weight: .semibold, design: .rounded))
+                            .rotation3DEffect(
+                                .degrees(angle),
+                                axis: (x: 0, y: 1, z: 0)
+                            )
+                    }
                 }
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .center)

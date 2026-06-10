@@ -5,40 +5,119 @@
 //  Created by Kevin Struna on 12/31/25.
 //
 
+import SwiftData
 import SwiftUI
 
 struct KanaView: View {
+    @Environment(\.modelContext) private var context
     @State private var kanaViewModel = KanaViewModel()
     @State private var showSheet: Bool = false
+    var midnightTonight: Date {
+        let startOfToday = Calendar.current.startOfDay(for: Date())
+        return Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date()
+    }
+
     @AppStorage("appTheme") var appTheme: String = "Ocean"
     
     
     var body: some View {
         NavigationStack {
             GeometryReader { mainProxy in
+                let buttonFrameSize = min(mainProxy.size.width * 0.07, mainProxy.size.height * 0.07)
+                let mediumFontSize = max(mainProxy.size.width * 0.025, mainProxy.size.height * 0.025)
+                let LargeFontSize = max(mainProxy.size.width * 0.05, mainProxy.size.height * 0.05)
+                
                 ZStack {
                     Color(appTheme).opacity(0.5)
                         .ignoresSafeArea()
                     VStack {
-                        CardView(kanaViewModel: kanaViewModel)
-                        HStack {
-                            Button(action: kanaViewModel.previousCard) {
-                                Label("Previous Card", systemImage: "arrow.left")
+                        if kanaViewModel.filteredKana.isEmpty {
+                            VStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .padding()
+                                Text("You're all done for today! Come back soon for more practice.")
+                                HStack {
+                                    Image(systemName: "clock")
+                                    Text(midnightTonight, style: .timer)
+                                }
+                                .padding(.top)
+                                .font(.system(size: mediumFontSize, weight: .semibold, design: .monospaced))
                             }
+                            .padding()
+                            .foregroundStyle(Color.white)
+                            .font(.system(size: LargeFontSize, weight: .semibold, design: .rounded))
+                            .multilineTextAlignment(.center)
+                            .background(
+                                GlassCardBackground(kanaViewModel: kanaViewModel)
+                            )
+                            .aspectRatio(mainProxy.size.width < mainProxy.size.height ? 1/1 : 5/3, contentMode: .fit)
                             
-                            Text(kanaViewModel.currentIndex.description + " / " + kanaViewModel.filteredKana.count.description)
-                                .font(.system(size: mainProxy.size.height * 0.05, weight: .semibold, design: .rounded))
-                                .padding()
-                            
-                            Button(action: kanaViewModel.nextCard) {
-                                Label("Next Card", systemImage: "arrow.right")
+
+                        } else {
+                            CardView(kanaViewModel: kanaViewModel)
+                            if kanaViewModel.isFront {
+                                HStack {
+                                    Button(action: kanaViewModel.previousCard) {
+                                        Label("Previous Card", systemImage: "arrow.left")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                    
+                                    Text(kanaViewModel.currentIndex.description + " / " + kanaViewModel.filteredKana.count.description)
+                                        .font(.system(size: LargeFontSize, weight: .semibold, design: .rounded))
+                                        .padding()
+                                    
+                                    Button(action: kanaViewModel.nextCard) {
+                                        Label("Next Card", systemImage: "arrow.right")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                }
+                                .padding(.bottom)
+                                .font(.system(size: mediumFontSize, weight: .semibold, design: .rounded))
+                                .lineLimit(1)
+                                .labelStyle(.iconOnly)
+                                .buttonStyle(.glassProminent)
+                                
+                            } else {
+                                Text("How did you do?")
+                                    .font(.system(size: mediumFontSize, weight: .semibold, design: .rounded))
+                                    .padding()
+                                    
+                                HStack {
+                                    Button(action: {
+                                        kanaViewModel.calculateRatings(ratingType: .fail)
+                                    }) {
+                                        Label("Fail", systemImage: "xmark")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                    
+                                    Button(action: {
+                                        kanaViewModel.calculateRatings(ratingType: .hard)
+                                    }) {
+                                        Label("Hard", systemImage: "exclamationmark")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                    
+                                    Button(action: {
+                                        kanaViewModel.calculateRatings(ratingType: .good)
+                                    }) {
+                                        Label("Good", systemImage: "checkmark")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                    
+                                    Button(action: {
+                                        kanaViewModel.calculateRatings(ratingType: .easy)
+                                    }) {
+                                        Label("Easy", systemImage: "sparkles")
+                                            .frame(width: buttonFrameSize, height: buttonFrameSize)
+                                    }
+                                }
+                                .padding(.bottom)
+                                .font(.system(size: mediumFontSize, weight: .semibold, design: .rounded))
+                                .lineLimit(1)
+                                .labelStyle(.iconOnly)
+                                .buttonStyle(.glassProminent)
                             }
                         }
-                        .padding(.bottom)
-                        .font(.system(size: mainProxy.size.height * 0.025, weight: .semibold, design: .rounded))
-                        .lineLimit(1)
-                        .labelStyle(.iconOnly)
-                        .buttonStyle(.glassProminent)
                     }
                     .sheet(isPresented: $showSheet) {
                         NavigationStack {
@@ -132,6 +211,9 @@ struct KanaView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            kanaViewModel.fetchKana(modelContext: context)
         }
     }
 }

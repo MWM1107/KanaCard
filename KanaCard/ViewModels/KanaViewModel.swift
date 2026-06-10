@@ -6,17 +6,22 @@
 //
 
 import Foundation
-import SwiftUI
 import SwiftData
+import SwiftUI
+
 
 enum KanaFilter {
     case hiragana, katakana, all
 }
 
 @Observable
+@MainActor
 class KanaViewModel {
     
     // MARK: - Properties
+    private var modelContext: ModelContext?
+    var fetchedKana: [Kana] = []
+    
     var isSeion: Bool = true {
         didSet {
             if !isSeion && !isDakuon && !isHandakuon && !isYoon {
@@ -53,7 +58,6 @@ class KanaViewModel {
         }
     }
     
-    var allKana: [Kana] = []
     var currentIndex: Int = 0
     var isFront: Bool = true
     
@@ -62,12 +66,6 @@ class KanaViewModel {
             resetCurrentIndex()
             isFront = true
         }
-    }
-    
-    // MARK: - Initialization
-    
-    init(allKana: [Kana] = Kana.allExamples) {
-        self.allKana = allKana
     }
     
     // MARK: - Computed Properties
@@ -93,28 +91,39 @@ class KanaViewModel {
                 
         switch filter {
             case .hiragana:
-                return allKana.filter { kana in
-                    kana.type == .hiragana && allowed.contains(kana.variant)
+                return fetchedKana.filter { kana in
+                    kana.type == .hiragana && allowed.contains(kana.variant) && kana.dueDate <= Date()
                 }
                     
             case .katakana:
-                return allKana.filter { kana in
-                    kana.type == .katakana && allowed.contains(kana.variant)
+                return fetchedKana.filter { kana in
+                    kana.type == .katakana && allowed.contains(kana.variant) && kana.dueDate <= Date()
                 }
                     
             case .all:
-                return allKana
+                return fetchedKana.filter { kana in
+                    allowed.contains(kana.variant) && kana.dueDate <= Date()
+                }
             }
         }
     
-    var currentCard: Kana {
-        filteredKana[currentIndex]
+    var currentCard: Kana? {
+        if filteredKana.isEmpty {
+            return nil
+        }
+        return filteredKana[currentIndex]
     }
     
     // MARK: - Methods / Intents
     
+    func fetchKana(modelContext: ModelContext) {
+        self.modelContext = modelContext
+        let descriptor = FetchDescriptor<Kana>()
+        self.fetchedKana = (try? modelContext.fetch(descriptor)) ?? []
+    }
+    
     func shuffleKanaCards() {
-        allKana.shuffle()
+        fetchedKana.shuffle()
     }
     
     func nextCard() {
@@ -139,5 +148,46 @@ class KanaViewModel {
     
     func resetCurrentIndex() {
         currentIndex = 0
+    }
+    
+    func calculateRatings(ratingType: RatingType) {
+        
+        guard let currentCard else {
+            return
+        }
+        
+        switch ratingType {
+        case .fail:
+            currentCard.repetitions = 0
+            currentCard.interval = 0
+            currentCard.easeFactor = max(currentCard.easeFactor - 0.2, 1.3)
+        case .hard:
+            currentCard.repetitions += 1
+            currentCard.interval = max(Int(Double(currentCard.interval) * 1.2), 1)
+            currentCard.easeFactor = max(currentCard.easeFactor - 0.15, 1.3)
+        case .good:
+            currentCard.repetitions += 1
+            if currentCard.repetitions == 1 {
+                currentCard.interval = 1
+            } else if currentCard.repetitions == 2 {
+                currentCard.interval = 6
+            } else if currentCard.repetitions > 2 {
+                currentCard.interval = Int(Double(currentCard.interval) * currentCard.easeFactor)
+            }
+        case .easy:
+            currentCard.repetitions += 1
+            if currentCard.interval == 0 {
+                currentCard.interval = 4
+            } else {
+                currentCard.interval = Int(Double(currentCard.interval) * currentCard.easeFactor * 1.3)
+            }
+            currentCard.easeFactor = max(currentCard.easeFactor + 0.15, 1.3)
+        }
+        // Calculate, set the card's new due date
+        currentCard.dueDate = Calendar.current.date(byAdding: .day, value: currentCard.interval, to: Date()) ?? Date()
+        // Save database connection
+        try? modelContext?.save()
+        // Move to the next card
+        nextCard()
     }
 }

@@ -12,13 +12,12 @@ struct KanaView: View {
     @Environment(\.modelContext) private var context
     @State private var kanaViewModel = KanaViewModel()
     @State private var showSheet: Bool = false
+    @AppStorage("appTheme") var appTheme: String = "Ocean"
+
     var midnightTonight: Date {
         let startOfToday = Calendar.current.startOfDay(for: Date())
         return Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date()
     }
-
-    @AppStorage("appTheme") var appTheme: String = "Ocean"
-    
     
     var body: some View {
         NavigationStack {
@@ -35,7 +34,7 @@ struct KanaView: View {
                             VStack {
                                 Image(systemName: "checkmark.circle.fill")
                                     .padding()
-                                Text("You're all done for today! Come back soon for more practice.")
+                                Text("You're all done for today!")
                                 HStack {
                                     Image(systemName: "clock")
                                     Text(midnightTonight, style: .timer)
@@ -55,6 +54,7 @@ struct KanaView: View {
 
                         } else {
                             CardView(kanaViewModel: kanaViewModel)
+                                .sensoryFeedback(.impact(weight: .heavy), trigger: kanaViewModel.isFront)
                             if kanaViewModel.isFront {
                                 HStack {
                                     Button(action: kanaViewModel.previousCard) {
@@ -71,6 +71,7 @@ struct KanaView: View {
                                             .frame(width: buttonFrameSize, height: buttonFrameSize)
                                     }
                                 }
+                                .sensoryFeedback(.impact(weight: .light), trigger: kanaViewModel.currentIndex)
                                 .padding(.bottom)
                                 .font(.system(size: mediumFontSize, weight: .semibold, design: .rounded))
                                 .lineLimit(1)
@@ -111,6 +112,7 @@ struct KanaView: View {
                                             .frame(width: buttonFrameSize, height: buttonFrameSize)
                                     }
                                 }
+                                .sensoryFeedback(.impact(weight: .medium), trigger: kanaViewModel.currentIndex)
                                 .padding(.bottom)
                                 .font(.system(size: mediumFontSize, weight: .semibold, design: .rounded))
                                 .lineLimit(1)
@@ -119,6 +121,7 @@ struct KanaView: View {
                             }
                         }
                     }
+                    .animation(.snappy, value: kanaViewModel.currentIndex)
                     .sheet(isPresented: $showSheet) {
                         NavigationStack {
                             Form {
@@ -204,6 +207,9 @@ struct KanaView: View {
                     
                     .toolbar {
                         ToolbarItemGroup(placement: .primaryAction) {
+                            NavigationLink(destination: StatsView(kanaViewModel: kanaViewModel)) {
+                                Label("Stats", systemImage: "chart.bar")
+                            }
                             Button(action: { showSheet.toggle() }) {
                                 Label("Settings", systemImage: "gear")
                             }

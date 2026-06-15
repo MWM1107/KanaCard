@@ -1,5 +1,9 @@
 # 🎴 KanaCard 
 
+<p align="center">
+   <img width="256" height="256" alt="AppIcon-iOS-Default-1024x1024@1x" src="https://github.com/user-attachments/assets/1ea42284-8e2b-4e19-9b99-8ef6d2ab0c6a" />
+</p>
+
 **KanaCard** is a high-fidelity Japanese learning application built with Swift and SwiftUI, designed to help users master Hiragana and Katakana through active recall, spaced repetition, and fluid, tactile interactions.
 
 <!-- 🎥 Demo video coming soon -->

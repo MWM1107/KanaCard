@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import Charts
 
 struct StatsView: View {
     @Bindable var kanaViewModel: KanaViewModel
@@ -16,6 +17,18 @@ struct StatsView: View {
     }
     var futureCards: Int {
         return kanaViewModel.fetchedKana.filter { kana in kana.dueDate > Date() }.count
+    }
+    var easyCards: Int {
+        return kanaViewModel.fetchedKana.filter { kana in kana.lastRating == .easy }.count
+    }
+    var goodCards: Int {
+        return kanaViewModel.fetchedKana.filter { kana in kana.lastRating == .good }.count
+    }
+    var hardCards: Int {
+        return kanaViewModel.fetchedKana.filter { kana in kana.lastRating == .hard }.count
+    }
+    var failCards: Int {
+        return kanaViewModel.fetchedKana.filter { kana in kana.lastRating == .fail }.count
     }
     var dueCards: Int {
         return kanaViewModel.fetchedKana.filter { kana in kana.dueDate <= Date() }.count
@@ -45,90 +58,126 @@ struct StatsView: View {
                 Color(appTheme).opacity(0.5)
                     .ignoresSafeArea()
                 ScrollView {
-                    // Daily Snapshot Section
-                    VStack {
-                        Text("Your Daily Snapshot")
-                            .font(Font.custom("Avenir-Black", size: 24))
+                    // MARK: - Daily Snapshot Section
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Daily Snapshot")
+                            .font(Font.title.bold())
                         HStack {
                             VStack {
                                 Text(futureCards.description)
                                     .font(Font.largeTitle.bold().monospaced())
-                                Text("Cards scheduled")
+                                Label("Cards scheduled", systemImage: "calendar.badge.clock")
                                     .font(Font.callout)
                             }
+                            Spacer()
                             VStack {
                                 Text(dueCards.description)
                                     .font(Font.largeTitle.bold().monospaced())
-                                Text("Cards due today")
+                                Label("Cards due today", systemImage: "calendar.badge.exclamationmark")
                                     .font(Font.callout)
                             }
                         }
                     }
                     .padding()
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundStyle(Color.white)
                     .background(
                         GlassCardBackground(kanaViewModel: kanaViewModel)
                     )
                     
-                    // Deck Mastery
-                    VStack {
-                        Text("Your Deck Mastery")
-                            .font(Font.custom("Avenir-Black", size: 24))
+                    // MARK: - Deck Mastery
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Deck Mastery")
+                            .font(Font.title.bold())
                         HStack {
                             VStack {
                                 Text(masteredCards.description)
                                     .font(Font.largeTitle.bold().monospaced())
-                                Text("Cards mastered")
+                                Label("Cards mastered", systemImage: "app.badge.checkmark.fill")
                                     .font(Font.callout)
                                 
                             }
+                            Spacer()
                             VStack {
                                 Text(learningCards.description)
                                     .font(Font.largeTitle.bold().monospaced())
-                                Text("Cards to learn")
+                                Label("Cards to learn", systemImage: "app.badge.clock.fill")
                                     .font(Font.callout)
                             }
                         }
                     }
                     .padding()
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundStyle(Color.white)
                     .background(
                         GlassCardBackground(kanaViewModel: kanaViewModel)
                     )
                     
-                    // Script Breakdown
-                    VStack {
-                        Text("Your Script Breakdown")
-                            .font(Font.custom("Avenir-Black", size: 24))
+                    // MARK: - Script Breakdown
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Script Breakdown")
+                            .font(Font.title.bold())
                         HStack {
                             VStack {
                                 Text(hiraganaMastered.description)
                                     .font(Font.largeTitle.bold().monospaced())
                                 ProgressView(value: Double(hiraganaMastered), total: Double(totalHiragana))
                                     .progressViewStyle(LinearProgressViewStyle())
-                                Text("Hiragana mastered")
+                                    .padding()
+                                Label("Hiragana mastered", systemImage: "h.square")
                                     .font(Font.callout)
+                                    .lineLimit(1)
                             }
+                            Spacer()
                             VStack {
                                 Text(katakanaMastered.description)
                                     .font(Font.largeTitle.bold().monospaced())
                                 ProgressView(value: Double(katakanaMastered), total: Double(totalKatakana))
                                     .progressViewStyle(LinearProgressViewStyle())
-                                Text("Katakana mastered")
+                                    .padding()
+                                Label("Katakana mastered", systemImage: "k.square")
                                     .font(Font.callout)
+                                    .lineLimit(1)
                             }
                         }
                     }
                     .padding()
                     .foregroundStyle(Color.white)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        GlassCardBackground(kanaViewModel: kanaViewModel)
+                    )
+                    
+                    // MARK: - Pie Chart Rating Breakdown
+                    VStack(alignment: .leading, spacing: 15) {
+                        Text("Rating Breakdown")
+                            .font(Font.title.bold())
+                        Chart {
+                            SectorMark(angle: .value("Easy", easyCards))
+                                .foregroundStyle(by: .value("Rating", "Easy"))
+                            SectorMark(angle: .value("Good", goodCards))
+                                .foregroundStyle(by: .value("Rating", "Good"))
+                            SectorMark(angle: .value("Hard", hardCards))
+                                .foregroundStyle(by: .value("Rating", "Hard"))
+                            SectorMark(angle: .value("Fail", failCards))
+                                .foregroundStyle(by: .value("Rating", "Fail"))
+                        }
+                        .chartForegroundStyleScale([
+                            "Easy": .blue,
+                            "Good": .green,
+                            "Hard": .yellow,
+                            "Fail": .red
+                        ])
+                    }
+                    .padding()
+                    .foregroundStyle(Color.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
                         GlassCardBackground(kanaViewModel: kanaViewModel)
                     )
                     
                 }
+                .padding()
                 .navigationTitle("Progress and Stats")
             }
         }

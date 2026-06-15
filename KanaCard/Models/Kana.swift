@@ -15,6 +15,7 @@ class Kana: Identifiable {
     var romaji: String    // "a"
     var type: KanaType    // enum: .hiragana or .katakana
     var variant: KanaVariant // enum: .seion, .dakuon, .handakuon, .yoon
+    var lastRating: RatingType? // enum: .fail, .hard, .good, .easy
     
     // SRS Properties
     var dueDate: Date // The exact date this card should appear in the active deck again.
@@ -22,12 +23,13 @@ class Kana: Identifiable {
     var easeFactor: Double // The multiplier that dictates how fast the interval grows (usually starts at 2.5).
     var repetitions: Int // The number of consecutive times the user has answered this card correctly.
     
-    init(id: UUID = UUID(), character: String, romaji: String, type: KanaType, variant: KanaVariant, dueDate: Date = Date(), interval: Int = 0, easeFactor: Double = 2.5, repetitions: Int = 0) {
+    init(id: UUID = UUID(), character: String, romaji: String, type: KanaType, variant: KanaVariant, lastRating: RatingType? = nil, dueDate: Date = Date(), interval: Int = 0, easeFactor: Double = 2.5, repetitions: Int = 0) {
         self.id = id
         self.character = character
         self.romaji = romaji
         self.type = type
         self.variant = variant
+        self.lastRating = lastRating
         self.dueDate = dueDate
         self.interval = interval
         self.easeFactor = easeFactor
@@ -47,7 +49,7 @@ enum KanaVariant: String, Codable, CaseIterable, Hashable {
     case yoon       // Contracted (kya, sha, etc.)
 }
 
-enum RatingType: String {
+enum RatingType: String, Codable {
     case fail
     case hard
     case good

@@ -185,9 +185,17 @@ class KanaViewModel {
         }
         // Calculate, set the card's new due date
         currentCard.dueDate = Calendar.current.date(byAdding: .day, value: currentCard.interval, to: Date()) ?? Date()
+        // set the last rating before saving
+        currentCard.lastRating = ratingType
         // Save database connection
         try? modelContext?.save()
         // Move to the next card
         nextCard()
+    }
+    
+    struct DailyForecast {
+        var date: Date
+        var cardsDue: Int
+        
     }
 }

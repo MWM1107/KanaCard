@@ -114,6 +114,30 @@ class KanaViewModel {
         return filteredKana[currentIndex]
     }
     
+    var upcomingWeekForecast: [DailyForecast] {
+        var forecast: [DailyForecast] = []
+        for index in 0..<7 {
+            let targetDate = Date().addingTimeInterval(60*60*24*Double(index))
+
+            forecast.append(DailyForecast(date: targetDate, cardsDue: fetchedKana.filter {
+                kana in Calendar.current.isDate(kana.dueDate, inSameDayAs: targetDate)
+            }.count))
+        }
+        return forecast
+    }
+    
+    var masteredCardsHistory: [Kana] {
+        return fetchedKana.filter { kana in kana.dateMastered != nil
+        }.sorted()
+    }
+    
+    struct DailyForecast: Identifiable {
+        var id: UUID = UUID()
+        var date: Date
+        var cardsDue: Int
+        
+    }
+    
     // MARK: - Methods / Intents
     
     func fetchKana(modelContext: ModelContext) {
@@ -185,17 +209,15 @@ class KanaViewModel {
         }
         // Calculate, set the card's new due date
         currentCard.dueDate = Calendar.current.date(byAdding: .day, value: currentCard.interval, to: Date()) ?? Date()
-        // set the last rating before saving
+        // Set the last rating before saving
         currentCard.lastRating = ratingType
+        // Check and see if the card is mastered
+        if currentCard.interval >= 21 && currentCard.dateMastered == nil {
+            currentCard.dateMastered = Date()
+        }
         // Save database connection
         try? modelContext?.save()
         // Move to the next card
         nextCard()
-    }
-    
-    struct DailyForecast {
-        var date: Date
-        var cardsDue: Int
-        
     }
 }

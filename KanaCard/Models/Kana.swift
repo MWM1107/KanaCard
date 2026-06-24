@@ -9,13 +9,19 @@ import Foundation
 import SwiftData
 
 @Model
-class Kana: Identifiable {
+class Kana: Identifiable, Comparable {
+    
+    static func < (lhs: Kana, rhs: Kana) -> Bool {
+        return (lhs.dateMastered ?? Date.distantPast) < (rhs.dateMastered ?? Date.distantPast)
+    }
+    
     var id = UUID()
     var character: String // "あ"
     var romaji: String    // "a"
     var type: KanaType    // enum: .hiragana or .katakana
     var variant: KanaVariant // enum: .seion, .dakuon, .handakuon, .yoon
     var lastRating: RatingType? // enum: .fail, .hard, .good, .easy
+    var dateMastered: Date? // Date of when the card is mastered
     
     // SRS Properties
     var dueDate: Date // The exact date this card should appear in the active deck again.
@@ -23,13 +29,14 @@ class Kana: Identifiable {
     var easeFactor: Double // The multiplier that dictates how fast the interval grows (usually starts at 2.5).
     var repetitions: Int // The number of consecutive times the user has answered this card correctly.
     
-    init(id: UUID = UUID(), character: String, romaji: String, type: KanaType, variant: KanaVariant, lastRating: RatingType? = nil, dueDate: Date = Date(), interval: Int = 0, easeFactor: Double = 2.5, repetitions: Int = 0) {
+    init(id: UUID = UUID(), character: String, romaji: String, type: KanaType, variant: KanaVariant, lastRating: RatingType? = nil, dateMastered: Date? = nil, dueDate: Date = Date(), interval: Int = 0, easeFactor: Double = 2.5, repetitions: Int = 0) {
         self.id = id
         self.character = character
         self.romaji = romaji
         self.type = type
         self.variant = variant
         self.lastRating = lastRating
+        self.dateMastered = dateMastered
         self.dueDate = dueDate
         self.interval = interval
         self.easeFactor = easeFactor
